@@ -1,0 +1,258 @@
+---
+title: "ENV 115 Fall Temperature Analysis"
+author: "Connor Flynn"
+date: "10/11/2023"
+output: html_document
+---
+
+Load Libraries
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(plotly)
+```
+
+
+Read in Data
+
+```{r, warning=FALSE, message=FALSE}
+temp_kalauhaihai_garage <- read_csv(here("data/data_temp_AprOct2023_KalauhaihaiGarage_20970102.csv"), skip = 1)
+
+temp_kalauhaihai_makaha <- read_csv(here("data/data_temp_AprOct2023_KalauhaihaiMakaha_21445021.csv"), skip = 1)
+
+temp_kanewai_ledge_edge_norfolk <- read_csv(here("data/data_temp_AprOct2023_KanewaiFishpondLedgeEdgeNorfolk_20970110.csv"), skip = 1)
+
+temp_kanewai_ledge_shade_xmas_berry <- read_csv(here("data/data_temp_AprOct2023_KanewaiFishpondShadeUnderXmasBerry_21445020.csv"), skip = 1)
+
+temp_kanewai_spring_ledge <- read_csv(here("data/data_temp_AprOct2023_KanewaiSpringLedge_20970109.csv"), skip = 1)
+
+```
+
+
+Clean Column Names
+
+```{r, warning=FALSE, message=FALSE}
+temp_kalauhaihai_garage <- temp_kalauhaihai_garage %>% 
+  clean_names()
+
+temp_kalauhaihai_makaha <- temp_kalauhaihai_makaha %>% 
+  clean_names()
+
+temp_kanewai_ledge_edge_norfolk <- temp_kanewai_ledge_edge_norfolk %>% 
+  clean_names()
+
+temp_kanewai_ledge_shade_xmas_berry <- temp_kanewai_ledge_shade_xmas_berry %>% 
+  clean_names()
+
+temp_kanewai_spring_ledge <- temp_kanewai_spring_ledge %>% 
+  clean_names()
+
+```
+
+Change Column Names
+
+Temperature
+
+```{r, warning=FALSE, message=FALSE}
+colnames(temp_kalauhaihai_garage)[colnames(temp_kalauhaihai_garage) == "temp_c_lgr_s_n_20970102_sen_s_n_20970102"] ="temp_celsius"
+
+colnames(temp_kalauhaihai_makaha)[colnames(temp_kalauhaihai_makaha) == "temp_c_lgr_s_n_21445021_sen_s_n_21445021"] ="temp_celsius"
+
+colnames(temp_kanewai_ledge_edge_norfolk)[colnames(temp_kanewai_ledge_edge_norfolk) == "temp_c_lgr_s_n_20970110_sen_s_n_20970110"] ="temp_celsius"
+
+colnames(temp_kanewai_ledge_shade_xmas_berry)[colnames(temp_kanewai_ledge_shade_xmas_berry) == "temp_c_lgr_s_n_21445020_sen_s_n_21445020"] ="temp_celsius"
+
+colnames(temp_kanewai_spring_ledge)[colnames(temp_kanewai_spring_ledge) == "temp_c_lgr_s_n_20970109_sen_s_n_20970109"] ="temp_celsius"
+```
+
+Date Time
+
+```{r, warning=FALSE, message=FALSE}
+colnames(temp_kalauhaihai_garage)[colnames(temp_kalauhaihai_garage) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(temp_kalauhaihai_makaha)[colnames(temp_kalauhaihai_makaha) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(temp_kanewai_ledge_edge_norfolk)[colnames(temp_kanewai_ledge_edge_norfolk) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(temp_kanewai_ledge_shade_xmas_berry)[colnames(temp_kanewai_ledge_shade_xmas_berry) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(temp_kanewai_spring_ledge)[colnames(temp_kanewai_spring_ledge) == "date_time_gmt_10_00"] ="date_time"
+
+```
+
+Select Relevant Columns
+
+```{r, warning=FALSE, message=FALSE}
+temp_kalauhaihai_garage <- temp_kalauhaihai_garage %>% 
+  select(date_time, temp_celsius)
+
+temp_kalauhaihai_makaha <- temp_kalauhaihai_makaha %>% 
+  select(date_time, temp_celsius)
+
+temp_kanewai_ledge_edge_norfolk <- temp_kanewai_ledge_edge_norfolk %>% 
+  select(date_time, temp_celsius)
+
+temp_kanewai_ledge_shade_xmas_berry <- temp_kanewai_ledge_shade_xmas_berry %>% 
+  select(date_time, temp_celsius)
+
+temp_kanewai_spring_ledge <- temp_kanewai_spring_ledge %>% 
+  select(date_time, temp_celsius)
+```
+
+
+Make date_time a date class
+
+```{r, warning=FALSE, message=FALSE}
+temp_kalauhaihai_garage$date_time <- mdy_hms(temp_kalauhaihai_garage$date_time)
+
+temp_kalauhaihai_makaha$date_time <- mdy_hms(temp_kalauhaihai_makaha$date_time)
+
+temp_kanewai_ledge_edge_norfolk$date_time <- mdy_hms(temp_kanewai_ledge_edge_norfolk$date_time)
+
+temp_kanewai_ledge_shade_xmas_berry$date_time <- mdy_hms(temp_kanewai_ledge_shade_xmas_berry$date_time)
+
+temp_kanewai_spring_ledge$date_time <- mdy_hms(temp_kanewai_spring_ledge$date_time)
+```
+
+
+Plotting
+
+```{r, warning=FALSE, message=FALSE}
+ggplot(temp_kalauhaihai_garage, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+
+
+Trimming
+
+```{r, warning=FALSE, message=FALSE}
+# Define the start and end times for the desired range
+kalauhaihai_garage_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kalauhaihai_garage_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+temp_kalauhaihai_garage_trimmed <- temp_kalauhaihai_garage %>%
+  filter(date_time >= kalauhaihai_garage_start_time & date_time <= kalauhaihai_garage_end_time)
+
+ggplot(temp_kalauhaihai_garage_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Define the start and end times for the desired range
+kalauhaihai_makaha_start_time <- as.POSIXct("04-06-2023 09:49:00", format = "%m-%d-%Y %H:%M:%S")
+kalauhaihai_makaha_end_time <- as.POSIXct("10-04-2023 09:33:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5 to 10/4
+# Filter the dataframe to include only rows within the specified time range
+temp_kalauhaihai_makaha_trimmed <- temp_kalauhaihai_garage %>%
+  filter(date_time >= kalauhaihai_makaha_start_time & date_time <= kalauhaihai_makaha_end_time)
+
+ggplot(temp_kalauhaihai_makaha_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Define the start and end times for the desired range
+kanewai_ledge_edge_norfolk_start_time <- as.POSIXct("04-06-2023 10:27:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_ledge_edge_norfolk_end_time <- as.POSIXct("10-05-2023 10:17:00", format = "%m-%d-%Y %H:%M:%S")
+
+# Filter the dataframe to include only rows within the specified time range
+temp_kanewai_ledge_edge_norfolk_trimmed <- temp_kanewai_ledge_edge_norfolk %>%
+  filter(date_time >= kanewai_ledge_edge_norfolk_start_time & date_time <= kanewai_ledge_edge_norfolk_end_time)
+
+ggplot(temp_kanewai_ledge_edge_norfolk_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+```{r, warning=FALSE, message=FALSE}
+# Define the start and end times for the desired range
+kanewai_ledge_shade_xmas_berry_start_time <- as.POSIXct("04-06-2023 10:22:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_ledge_shade_xmas_berry_end_time <- as.POSIXct("10-05-2023 10:01:00", format = "%m-%d-%Y %H:%M:%S")
+
+# Filter the dataframe to include only rows within the specified time range
+temp_kanewai_ledge_shade_xmas_berry_trimmed <- temp_kanewai_ledge_shade_xmas_berry %>%
+  filter(date_time >= kanewai_ledge_shade_xmas_berry_start_time & date_time <= kanewai_ledge_shade_xmas_berry_end_time)
+
+ggplot(temp_kanewai_ledge_shade_xmas_berry_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Define the start and end times for the desired range
+kanewai_spring_ledge_start_time <- as.POSIXct("04-06-2023 10:34:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_spring_ledge_end_time <- as.POSIXct("10-04-2023 10:08:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5 to 10/4
+# Filter the dataframe to include only rows within the specified time range
+temp_kanewai_spring_ledge_trimmed <- temp_kanewai_spring_ledge %>%
+  filter(date_time >= kanewai_spring_ledge_start_time & date_time <= kanewai_spring_ledge_end_time)
+
+ggplot(temp_kanewai_spring_ledge_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line()
+```
+
+
+Customize Plot
+
+```{r, warning=FALSE, message=FALSE}
+temp_kanewai_spring_ledge_plot <- ggplot(temp_kanewai_spring_ledge_trimmed, aes(x = date_time, y = temp_celsius)) +
+  geom_line(color = "steelblue") +
+  theme_minimal() +
+  labs(title = "Temperature, Kanewai Spring Ledge",
+       subtitle = "April - October 2023",
+       x = "Date",
+       y = "Temperature (°C)")
+
+temp_kanewai_spring_ledge_plot
+```
+
+```{r, warning=FALSE, message=FALSE}
+ggplotly(temp_kanewai_spring_ledge_plot)
+```
+
+Join Data
+
+Add Location Column
+
+```{r, warning=FALSE, message=FALSE}
+temp_kalauhaihai_garage_trimmed$location = "kalauhaihai garage"
+
+temp_kalauhaihai_makaha_trimmed$location = "kalauhaihai makaha"
+
+temp_kanewai_ledge_edge_norfolk_trimmed$location = "kanewai ledge edge norfolk"
+
+temp_kanewai_ledge_shade_xmas_berry_trimmed$location = "kanewai ledge shade xmas berry"
+
+temp_kanewai_spring_ledge_trimmed$location = "kanewai spring ledge" 
+```
+
+Join
+
+```{r, warning=FALSE, message=FALSE}
+
+df_list <- list(temp_kalauhaihai_garage_trimmed, temp_kalauhaihai_makaha_trimmed, temp_kanewai_ledge_edge_norfolk_trimmed,
+                temp_kanewai_ledge_shade_xmas_berry_trimmed, temp_kanewai_spring_ledge_trimmed)
+
+
+combined_temp_df <- bind_rows(df_list)
+```
+
+
+Final Plot
+
+```{r, warning=FALSE, message=FALSE}
+combined_temp_df_plot <- ggplot(combined_temp_df, aes(x = date_time, y = temp_celsius, color = location)) +
+  geom_line(size = 0.2) +
+  facet_wrap(~location) +
+  theme_minimal() +
+  labs(title = "Temperature, Kanewai and Kaluhaihai",
+       subtitle = "April - October 2023",
+       x = "Date",
+       y = "Temperature (°C)") +
+  scale_color_brewer(palette = "Set3")
+
+ggplotly(combined_temp_df_plot)
+```
+
+
