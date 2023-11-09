@@ -1,0 +1,189 @@
+---
+title: "November Temperature Analysis"
+author: "Connor Flynn"
+date: "11/8/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(plotly)
+```
+
+
+Read in Data
+
+
+```{r}
+kalauhaihai_garage_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KalauhaihaiGarage_20970108.csv"), skip = 1)
+
+kalauhaihai_makaha_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KalauhaihaiMakaha_20970107.csv"), skip = 1)
+
+kanewai_auwai_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KanewaiAuwaiUnderFootBridge_20970093.csv"), skip = 1)
+
+kanewai_edge_norfolk_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KanewaiFishpondEdgeNorfolk_20970122.csv"), skip = 1)
+
+kanewai_rock_stairs_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KanewaiRockStairsByWall_20970092.csv"), skip = 1)
+
+kanewai_ledge_temp_OctNov <- read_csv(here("data/data_temp_OctNov2023_KanewaiSpringLedge_21445019.csv"), skip = 1)
+
+
+```
+
+
+
+Clean Column Names
+
+```{r}
+kalauhaihai_garage_temp_OctNov <- kalauhaihai_garage_temp_OctNov %>% 
+  clean_names()
+
+kalauhaihai_makaha_temp_OctNov <- kalauhaihai_makaha_temp_OctNov %>% 
+  clean_names()
+
+kanewai_auwai_temp_OctNov <- kanewai_auwai_temp_OctNov %>% 
+  clean_names()
+
+kanewai_edge_norfolk_temp_OctNov <- kanewai_edge_norfolk_temp_OctNov %>% 
+  clean_names()
+
+kanewai_rock_stairs_temp_OctNov <- kanewai_rock_stairs_temp_OctNov %>% 
+  clean_names()
+
+kanewai_ledge_temp_OctNov <- kanewai_ledge_temp_OctNov %>% 
+  clean_names()
+```
+
+
+Change Column Names
+
+Temp
+
+```{r}
+colnames(kalauhaihai_garage_temp_OctNov)[colnames(kalauhaihai_garage_temp_OctNov) == "temp_c_lgr_s_n_20970108_sen_s_n_20970108"] ="temp_celsius"
+
+colnames(kalauhaihai_makaha_temp_OctNov)[colnames(kalauhaihai_makaha_temp_OctNov) == "temp_c_lgr_s_n_20970107_sen_s_n_20970107"] ="temp_celsius"
+
+colnames(kanewai_auwai_temp_OctNov)[colnames(kanewai_auwai_temp_OctNov) == "temp_c_lgr_s_n_20970093_sen_s_n_20970093"] ="temp_celsius"
+
+colnames(kanewai_edge_norfolk_temp_OctNov)[colnames(kanewai_edge_norfolk_temp_OctNov) == "temp_c_lgr_s_n_20970122_sen_s_n_20970122"] ="temp_celsius"
+
+colnames(kanewai_rock_stairs_temp_OctNov)[colnames(kanewai_rock_stairs_temp_OctNov) == "temp_c_lgr_s_n_20970092_sen_s_n_20970092"] ="temp_celsius"
+
+colnames(kanewai_ledge_temp_OctNov)[colnames(kanewai_ledge_temp_OctNov) == "temp_c_lgr_s_n_21445019_sen_s_n_21445019"] ="temp_celsius"
+```
+
+Date Time
+
+```{r}
+
+colnames(kalauhaihai_garage_temp_OctNov)[colnames(kalauhaihai_garage_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(kalauhaihai_makaha_temp_OctNov)[colnames(kalauhaihai_makaha_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(kanewai_auwai_temp_OctNov)[colnames(kanewai_auwai_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(kanewai_edge_norfolk_temp_OctNov)[colnames(kanewai_edge_norfolk_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(kanewai_rock_stairs_temp_OctNov)[colnames(kanewai_rock_stairs_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+
+colnames(kanewai_ledge_temp_OctNov)[colnames(kanewai_ledge_temp_OctNov) == "date_time_gmt_10_00"] ="date_time"
+```
+
+Select relevant columns
+
+```{r}
+kalauhaihai_garage_temp_OctNov <- kalauhaihai_garage_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+kalauhaihai_makaha_temp_OctNov <- kalauhaihai_makaha_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+kanewai_auwai_temp_OctNov <- kanewai_auwai_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+kanewai_edge_norfolk_temp_OctNov <- kanewai_edge_norfolk_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+kanewai_rock_stairs_temp_OctNov <- kanewai_rock_stairs_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+kanewai_ledge_temp_OctNov <- kanewai_ledge_temp_OctNov %>% 
+  select(date_time, temp_celsius) 
+
+```
+
+
+Make date_time a date class
+
+```{r, warning=FALSE, message=FALSE}
+kalauhaihai_garage_temp_OctNov$date_time <- mdy_hms(kalauhaihai_garage_temp_OctNov$date_time)
+
+kalauhaihai_makaha_temp_OctNov$date_time <- mdy_hms(kalauhaihai_makaha_temp_OctNov$date_time)
+
+kanewai_auwai_temp_OctNov$date_time <- mdy_hms(kanewai_auwai_temp_OctNov$date_time)
+
+kanewai_edge_norfolk_temp_OctNov$date_time <- mdy_hms(kanewai_edge_norfolk_temp_OctNov$date_time)
+
+kanewai_rock_stairs_temp_OctNov$date_time <- mdy_hms(kanewai_rock_stairs_temp_OctNov$date_time)
+
+kanewai_ledge_temp_OctNov$date_time <- mdy_hms(kanewai_ledge_temp_OctNov$date_time)
+```
+
+
+
+Trimming
+
+```{r}
+# Define the start and end times for the desired range
+kalauhaihai_garage_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kalauhaihai_garage_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kalauhaihai_garage_temp_OctNov_trimmed <- kalauhaihai_garage_temp_OctNov %>%
+  filter(date_time >= kalauhaihai_garage_start_time & date_time <= kalauhaihai_garage_end_time)
+
+
+kalauhaihai_makaha_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kalauhaihai_makaha_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kalauhaihai_makaha_temp_OctNov_trimmed <- kalauhaihai_makaha_temp_OctNov %>%
+  filter(date_time >= kalauhaihai_makaha_start_time & date_time <= kalauhaihai_makaha_end_time)
+
+
+kanewai_auwai_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_auwai_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kanewai_auwai_temp_OctNov_trimmed <- kanewai_auwai_temp_OctNov %>%
+  filter(date_time >= kanewai_auwai_start_time & date_time <= kanewai_auwai_end_time)
+
+
+kanewai_edge_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_edge_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kanewai_edge_norfolk_temp_OctNov_trimmed <- kanewai_edge_norfolk_temp_OctNov %>%
+  filter(date_time >= kanewai_auwai_start_time & date_time <= kanewai_auwai_end_time)
+
+kanewai_rock_stairs_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_rock_stairs_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kanewai_rock_stairs_temp_OctNov_trimmed <- kanewai_rock_stairs_temp_OctNov %>%
+  filter(date_time >= kanewai_rock_stairs_start_time & date_time <= kanewai_rock_stairs_end_time)
+
+kanewai_ledge_start_time <- as.POSIXct("04-06-2023 09:46:00", format = "%m-%d-%Y %H:%M:%S")
+kanewai_ledge_end_time <- as.POSIXct("10-04-2023 09:24:00", format = "%m-%d-%Y %H:%M:%S")
+# changed 10/5/2023 9:24:00 t0 10/4/2023 9:24:00
+# Filter the dataframe to include only rows within the specified time range
+kanewai_ledge_temp_OctNov_trimmed <- kanewai_ledge_temp_OctNov %>%
+  filter(date_time >= kanewai_ledge_start_time & date_time <= kanewai_ledge_end_time)
+
+
+```
+
